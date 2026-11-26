@@ -30,12 +30,18 @@ def decompress(data: str) -> int:
 
 def decompress_recursive(data: str) -> int:
     global REGEXP
-    if match := REGEXP.search(data):
-        start, end = match.start(), match.end()
-        x, y = map(int, match.groups())  # eg (3x5) -> x=3, y=5
-        return start + y * decompress_recursive(data[end:end+x]) + decompress_recursive(data[end+x:])
-    else:
-        return len(data)
+
+    # work with indices, dont copy strings
+    def rec(search_start: int, search_end: int) -> int:
+        if match := REGEXP.search(data, search_start, search_end+1):  # end exclusive
+            match_start, match_end = match.start(), match.end()
+            x, y = map(int, match.groups())  # eg (3x5) -> x=3, y=5
+            rest = rec(match_end+x, search_end) if match_end+x < search_end else 0
+            return match_start - search_start + y * rec(match_end, match_end+x) + rest
+        else:
+            return search_end - search_start
+
+    return rec(0, len(data))
 
 
 @timed("All")
