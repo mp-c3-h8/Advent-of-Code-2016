@@ -114,7 +114,7 @@ def shortest_path(facility: Facility) -> int:
                 for generators_taken in combinations(generators_on_curr_floor, amount):
                     generators_taken = set(generators_taken)
 
-                    new_generators_on_curr_floor = generators_on_curr_floor.difference(generators_taken)
+                    new_generators_on_curr_floor = generators_on_curr_floor - generators_taken
                     new_generators_on_new_floor = generators_on_new_floor | generators_taken
 
                     this_floor = (new_generators_on_curr_floor, chips_on_curr_floor)
@@ -128,11 +128,11 @@ def shortest_path(facility: Facility) -> int:
             # pick exactly one chip and one generator
             if len(chips_on_curr_floor) > 0 and len(generators_on_curr_floor) > 0:
                 for chip_taken, generator_taken in product(chips_on_curr_floor, generators_on_curr_floor):
+
                     new_chips_on_curr_floor = chips_on_curr_floor - {chip_taken}
                     new_chips_on_new_floor = chips_on_new_floor | {chip_taken}
                     new_generators_on_curr_floor = generators_on_curr_floor - {generator_taken}
                     new_generators_on_new_floor = generators_on_new_floor | {generator_taken}
-                    # print(new_chips_on_new_floor)
 
                     this_floor = (new_generators_on_curr_floor, new_chips_on_curr_floor)
                     new_floor = (new_generators_on_new_floor, new_chips_on_new_floor)
@@ -159,12 +159,13 @@ def shortest_path(facility: Facility) -> int:
             shortest_paths[new_state] = new_steps
 
             # A*: penalize bad setups
-            #heuristic = new_floor_number + sum(sum(map(len, floor))//2 * (3-i) for i, floor in enumerate(new_facility))
-            new_prio = new_steps #+ heuristic
+            # heuristic = new_floor_number + sum(sum(map(len, floor))//2 * (3-i) for i, floor in enumerate(new_facility))
+            new_prio = new_steps  # + heuristic
             new_count = i
             i += 1
             new_item = (new_prio, new_steps, new_count, new_state)
             heappush(q, new_item)
+
     return 0
 
 
